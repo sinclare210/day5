@@ -32,8 +32,8 @@ contract AdminOnly {
 
         if(owner == msg.sender){
             require(amount < treasurAmount, "Not enough");
-            (bool success,) = msg.sender.call{value:amount}("");
-            require(success, "Failed");
+            (bool successs,) = msg.sender.call{value:amount}("");
+            require(successs, "Failed");
             treasurAmount -= amount;
         }
         require(withdrawAllowance[msg.sender] <= amount, "Not enough");
@@ -44,9 +44,10 @@ contract AdminOnly {
         require(success, "Failed");
     }
 
-    function resetWithdrawStatus(uint amount, address addy) public onlyOwner{
-         require (allowWithdrawal[msg.sender],"Not Allowed");
-         withdrawAllowance[msg.sender] = 0;
+    function resetWithdrawStatus(uint256 amount, address addy) public onlyOwner{
+        require(withdrawAllowance[addy] <= amount, "Doings");
+         require (allowWithdrawal[addy],"Not Allowed");
+         withdrawAllowance[addy] = 0;
     }
 
     function transferOwner (address addy) public onlyOwner {
