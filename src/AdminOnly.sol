@@ -28,26 +28,31 @@ contract AdminOnly {
         allowWithdrawal[addy] = true;
     }
 
-    function withdrawAmountByUser (uint256 amount) public {
-
-        if(owner == msg.sender){
-            require(amount < treasurAmount, "Not enough");
-            (bool successs,) = msg.sender.call{value:amount}("");
-            require(successs, "Failed");
-            treasurAmount -= amount;
-        }
-        require(withdrawAllowance[msg.sender] <= amount, "Not enough");
-        require (allowWithdrawal[msg.sender],"Not Allowed");
-        withdrawAllowance[msg.sender] -= amount;
-        treasurAmount -= amount;
-        (bool success,) = msg.sender.call{value:amount}("");
+    function withdrawAmountByUser(uint256 amount) public {
+        require (amount > 0, "Not ALLOWED");
+    if (msg.sender == owner) {
+        require(amount <= treasurAmount, "Not enough");
+        (bool success,) = msg.sender.call{value: amount}("");
         require(success, "Failed");
+        treasurAmount -= amount;
+        return; // ✅ Stop execution here
     }
 
+    require(allowWithdrawal[msg.sender], "Not Allowed");
+    require(withdrawAllowance[msg.sender] >= amount, "Not enough");  // ✅ Fix comparison
+
+    withdrawAllowance[msg.sender] -= amount;
+    treasurAmount -= amount;
+
+    (bool success,) = msg.sender.call{value: amount}("");
+    require(success, "Failed");
+}
+
+
     function resetWithdrawStatus(uint256 amount, address addy) public onlyOwner{
-        require(withdrawAllowance[addy] <= amount, "Doings");
+        
          require (allowWithdrawal[addy],"Not Allowed");
-         withdrawAllowance[addy] = 0;
+         withdrawAllowance[addy] = amount;
     }
 
     function transferOwner (address addy) public onlyOwner {
