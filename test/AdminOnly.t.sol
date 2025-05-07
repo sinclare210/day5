@@ -50,6 +50,20 @@ contract AdminOnlyTest is Test {
 
     }
 
+    function testApproveWithdrawWorksPerfectly () public {
+
+        address sinclair = address(0x1);
+        adminOnly.addTreasure{value: 1 ether}();
+        
+
+        adminOnly.approveWithdraw(sinclair, 0.5 ether);
+        assertEq(adminOnly.withdrawAllowance(sinclair), 0.5 ether);
+        assertEq(adminOnly.allowWithdrawal(sinclair), true);
+
+    }
+
+    
+
 
 
 
